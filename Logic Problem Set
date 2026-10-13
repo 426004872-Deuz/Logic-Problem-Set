@@ -1,0 +1,66 @@
+String getRemark(int score) {
+  if (score >= 90) {
+    return 'Excellent';
+  } else if (score >= 75) {
+    return 'Passed';
+  } else if (score >= 60) {
+    return 'Needs improvement';
+  } else {
+    return 'Failed';
+  }
+}
+
+int parseScore(String raw) {
+  int score = int.parse(raw.trim());
+  if (score < 0 || score > 100) {
+    throw RangeError('Score $score is outside the 0-100 range');
+  }
+  return score;
+}
+
+double processScores(List<String> rawScores) {
+  int total = 0;
+  int validCount = 0;
+
+  for (int i = 0; i < rawScores.length; i++) {
+    try {
+      int score = parseScore(rawScores[i]);
+      String remark = getRemark(score);
+      print('Student ${i + 1}: $score -> $remark');
+      total += score;
+      validCount++;
+    } on FormatException {
+      print('Student ${i + 1}: "${rawScores[i]}" is not a number, skipped');
+    } on RangeError catch (e) {
+      print('Student ${i + 1}: ${e.message}, skipped');
+    }
+  }
+
+  if (validCount == 0) {
+    return 0.0;
+  }
+  return total / validCount;
+}
+
+void main() {
+  print('=== Score Checker ===');
+
+  List<String> classScores = ['92', '78', '65', '40', '88'];
+  print('\nBatch 1: valid input');
+  double firstAverage = processScores(classScores);
+  print('Average: ${firstAverage.toStringAsFixed(2)} '
+      '(${getRemark(firstAverage.round())})');
+
+  List<String> badScores = ['85', 'abc', '120', '70', ''];
+  print('\nBatch 2: bad input');
+  double secondAverage = processScores(badScores);
+  print('Average of valid scores: ${secondAverage.toStringAsFixed(2)} '
+      '(${getRemark(secondAverage.round())})');
+
+  print('\nRepeating the task 3 times:');
+  for (int round = 1; round <= 3; round++) {
+    print('Round $round: program still running without crashing');
+  }
+
+  print('\nDone.');
+}
